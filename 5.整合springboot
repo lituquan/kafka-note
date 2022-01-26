@@ -1,0 +1,22 @@
+### 生产者
+    spring.kafka.bootstrap-servers=${kafka.addr} 
+
+    KafkaTemplate
+
+    kafkaTemplate.send(topic, content)
+                .completable()
+                .thenApply(r -> log(topic, content, r))
+                .exceptionally(this::cacheException); 
+### 消费者
+
+    spring.kafka.consumer.group-id=xinwo-order-system-qas
+    spring.kafka.consumer.bootstrap-servers=${kafka.addr}  
+
+    @KafkaListener(topics = MqConstants.Topic)
+    @Transactional
+    public void deleteCustomer(String message) {
+        log.info("kafka: {}", message);
+        KafkaMessage kafkaMessage = JSON.parseObject(message, KafkaMessage.class);
+        //逻辑处理
+        do(kafkaMessage)
+    }
